@@ -28,19 +28,24 @@ const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN || "";
 const USE_MOCK = !process.env.NEXT_PUBLIC_STRAPI_URL;
 
 // ── Helper: Strapi-Bild-URL aufloesen ──
-export function strapiImage(url?: string): string | undefined {
+export function strapiImage(url?: string | null): string | undefined {
   if (!url) return undefined;
   if (url.startsWith("http")) return url;
   return `${STRAPI_URL}${url}`;
 }
 
-// ── Generischer Strapi Fetch ──
+// ── Generischer Strapi v5 Fetch ──
 async function fetchStrapi<T>(endpoint: string): Promise<T> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  // Only add auth header if token exists
+  if (STRAPI_TOKEN) {
+    headers.Authorization = `Bearer ${STRAPI_TOKEN}`;
+  }
+
   const res = await fetch(`${STRAPI_URL}/api${endpoint}`, {
-    headers: {
-      Authorization: `Bearer ${STRAPI_TOKEN}`,
-      "Content-Type": "application/json",
-    },
+    headers,
     next: { revalidate: 60 },
   });
 
@@ -56,21 +61,19 @@ async function fetchStrapi<T>(endpoint: string): Promise<T> {
 export async function getSiteSettings(): Promise<SiteSettings> {
   if (USE_MOCK) return mockSiteSettings;
   try {
-    const raw = await fetchStrapi<{ attributes: Record<string, string> }>(
-      "/site-setting?populate=*"
-    );
-    const a = raw.attributes;
+    // Strapi v5: fields are directly on the data object (no .attributes)
+    const raw = await fetchStrapi<Record<string, any>>("/site-setting?populate=*");
     return {
-      siteName: a.siteName || mockSiteSettings.siteName,
-      siteSubtitle: a.siteSubtitle || mockSiteSettings.siteSubtitle,
-      logoText: a.logoText || mockSiteSettings.logoText,
-      email: a.email || mockSiteSettings.email,
-      location: a.location || mockSiteSettings.location,
-      responseTime: a.responseTime || mockSiteSettings.responseTime,
-      socialInstagram: a.socialInstagram || "",
-      socialFacebook: a.socialFacebook || "",
-      socialYoutube: a.socialYoutube || "",
-      socialTiktok: a.socialTiktok || "",
+      siteName: raw.siteName || mockSiteSettings.siteName,
+      siteSubtitle: raw.siteSubtitle || mockSiteSettings.siteSubtitle,
+      logoText: raw.logoText || mockSiteSettings.logoText,
+      email: raw.email || mockSiteSettings.email,
+      location: raw.location || mockSiteSettings.location,
+      responseTime: raw.responseTime || mockSiteSettings.responseTime,
+      socialInstagram: raw.socialInstagram || "",
+      socialFacebook: raw.socialFacebook || "",
+      socialYoutube: raw.socialYoutube || "",
+      socialTiktok: raw.socialTiktok || "",
     };
   } catch {
     return mockSiteSettings;
@@ -81,19 +84,16 @@ export async function getSiteSettings(): Promise<SiteSettings> {
 export async function getHeroContent(): Promise<HeroContent> {
   if (USE_MOCK) return mockHero;
   try {
-    const raw = await fetchStrapi<{ attributes: Record<string, string> }>(
-      "/hero-content?populate=*"
-    );
-    const a = raw.attributes;
+    const raw = await fetchStrapi<Record<string, any>>("/hero-content?populate=*");
     return {
-      tagline: a.tagline || mockHero.tagline,
-      titleLine1: a.titleLine1 || mockHero.titleLine1,
-      titleLine2: a.titleLine2 || mockHero.titleLine2,
-      description: a.description || mockHero.description,
-      ctaPrimaryText: a.ctaPrimaryText || mockHero.ctaPrimaryText,
-      ctaPrimaryLink: a.ctaPrimaryLink || mockHero.ctaPrimaryLink,
-      ctaSecondaryText: a.ctaSecondaryText || mockHero.ctaSecondaryText,
-      ctaSecondaryLink: a.ctaSecondaryLink || mockHero.ctaSecondaryLink,
+      tagline: raw.tagline || mockHero.tagline,
+      titleLine1: raw.titleLine1 || mockHero.titleLine1,
+      titleLine2: raw.titleLine2 || mockHero.titleLine2,
+      description: raw.description || mockHero.description,
+      ctaPrimaryText: raw.ctaPrimaryText || mockHero.ctaPrimaryText,
+      ctaPrimaryLink: raw.ctaPrimaryLink || mockHero.ctaPrimaryLink,
+      ctaSecondaryText: raw.ctaSecondaryText || mockHero.ctaSecondaryText,
+      ctaSecondaryLink: raw.ctaSecondaryLink || mockHero.ctaSecondaryLink,
     };
   } catch {
     return mockHero;
@@ -104,15 +104,14 @@ export async function getHeroContent(): Promise<HeroContent> {
 export async function getStats(): Promise<StatItem[]> {
   if (USE_MOCK) return mockStats;
   try {
-    const raw = await fetchStrapi<Array<{
-      id: number;
-      attributes: { value: string; label: string; reihenfolge: number };
-    }>>("/stats?sort=reihenfolge:asc");
+    const raw = await fetchStrapi<Array<Record<string, any>>>(
+      "/stats?sort=reihenfolge:asc"
+    );
     return raw.map((item) => ({
       id: item.id,
-      value: item.attributes.value,
-      label: item.attributes.label,
-      reihenfolge: item.attributes.reihenfolge,
+      value: item.value,
+      label: item.label,
+      reihenfolge: item.reihenfolge,
     }));
   } catch {
     return mockStats;
@@ -123,28 +122,18 @@ export async function getStats(): Promise<StatItem[]> {
 export async function getAboutContent(): Promise<AboutContent> {
   if (USE_MOCK) return mockAbout;
   try {
-    const raw = await fetchStrapi<{
-      attributes: {
-        headline: string;
-        highlightedWord: string;
-        text1: string;
-        text2: string;
-        portraitBadgeText: string;
-        portraitImage?: { data?: { attributes: { url: string } } };
-        qualifications: Array<{ id: number; icon: string; title: string; description: string }>;
-        tags: Array<{ id: number; label: string; color: BadgeColor }>;
-      };
-    }>("/about-content?populate=*");
-    const a = raw.attributes;
+    const raw = await fetchStrapi<Record<string, any>>(
+      "/about-content?populate=*"
+    );
     return {
-      headline: a.headline || mockAbout.headline,
-      highlightedWord: a.highlightedWord || mockAbout.highlightedWord,
-      text1: a.text1 || mockAbout.text1,
-      text2: a.text2 || mockAbout.text2,
-      portraitImage: strapiImage(a.portraitImage?.data?.attributes?.url),
-      portraitBadgeText: a.portraitBadgeText || mockAbout.portraitBadgeText,
-      qualifications: a.qualifications || mockAbout.qualifications,
-      tags: a.tags || mockAbout.tags,
+      headline: raw.headline || mockAbout.headline,
+      highlightedWord: raw.highlightedWord || mockAbout.highlightedWord,
+      text1: raw.text1 || mockAbout.text1,
+      text2: raw.text2 || mockAbout.text2,
+      portraitImage: strapiImage(raw.portraitImage?.url),
+      portraitBadgeText: raw.portraitBadgeText || mockAbout.portraitBadgeText,
+      qualifications: raw.qualifications || mockAbout.qualifications,
+      tags: raw.tags || mockAbout.tags,
     };
   } catch {
     return mockAbout;
@@ -155,53 +144,37 @@ export async function getAboutContent(): Promise<AboutContent> {
 export async function getOffers(): Promise<Offer[]> {
   if (USE_MOCK) return mockOffers;
   try {
-    const raw = await fetchStrapi<Array<{
-      id: number;
-      attributes: {
-        slug: string;
-        title: string;
-        shortTitle: string;
-        description: string;
-        longDescription: string;
-        icon: string;
-        badge: string;
-        badgeColor: BadgeColor;
-        gradient: string;
-        features: string;
-        ctaText: string;
-        ctaLink: string;
-        image?: { data?: { attributes: { url: string } } };
-        prices: Array<{
-          id: number;
-          name: string;
-          price: number;
-          unit: string;
-          description: string;
-          highlighted?: boolean;
-        }>;
-      };
-    }>>("/offers?populate=*&sort=id:asc");
+    const raw = await fetchStrapi<Array<Record<string, any>>>(
+      "/offers?populate=*&sort=id:asc"
+    );
 
-    return raw.map((item) => {
-      const a = item.attributes;
-      return {
-        id: item.id,
-        slug: a.slug,
-        title: a.title,
-        shortTitle: a.shortTitle,
-        description: a.description,
-        longDescription: a.longDescription,
-        icon: a.icon,
-        badge: a.badge,
-        badgeColor: a.badgeColor,
-        gradient: a.gradient,
-        features: typeof a.features === "string" ? a.features.split("\n").filter(Boolean) : a.features,
-        prices: a.prices || [],
-        image: strapiImage(a.image?.data?.attributes?.url),
-        ctaText: a.ctaText,
-        ctaLink: a.ctaLink,
-      };
-    });
+    return raw.map((item) => ({
+      id: item.id,
+      slug: item.slug,
+      title: item.title,
+      shortTitle: item.shortTitle,
+      description: item.description,
+      longDescription: item.longDescription,
+      icon: item.icon,
+      badge: item.badge,
+      badgeColor: item.badgeColor as BadgeColor,
+      gradient: item.gradient,
+      features:
+        typeof item.features === "string"
+          ? item.features.split("\n").filter(Boolean)
+          : item.features || [],
+      prices: (item.prices || []).map((p: Record<string, any>) => ({
+        id: p.id,
+        name: p.name,
+        price: p.price,
+        unit: p.unit,
+        description: p.description,
+        highlighted: p.highlighted || false,
+      })),
+      image: strapiImage(item.image?.url),
+      ctaText: item.ctaText,
+      ctaLink: item.ctaLink,
+    }));
   } catch {
     console.warn("Strapi nicht erreichbar, verwende Mock-Daten.");
     return mockOffers;
@@ -222,22 +195,19 @@ export async function getOfferBySlug(slug: string): Promise<Offer | null> {
 export async function getSchedule(): Promise<ScheduleItem[]> {
   if (USE_MOCK) return mockSchedule;
   try {
-    const raw = await fetchStrapi<Array<{
-      id: number;
-      attributes: {
-        day: string;
-        time: string;
-        type: string;
-        offerSlug: string;
-        badgeColor: BadgeColor;
-        location: string;
-        spotsLeft?: number;
-        price?: number;
-      };
-    }>>("/schedules?sort=id:asc");
+    const raw = await fetchStrapi<Array<Record<string, any>>>(
+      "/schedules?sort=id:asc"
+    );
     return raw.map((item) => ({
       id: item.id,
-      ...item.attributes,
+      day: item.day,
+      time: item.time,
+      type: item.type,
+      offerSlug: item.offerSlug,
+      badgeColor: item.badgeColor as BadgeColor,
+      location: item.location,
+      spotsLeft: item.spotsLeft,
+      price: item.price,
     }));
   } catch {
     return mockSchedule;
@@ -248,19 +218,16 @@ export async function getSchedule(): Promise<ScheduleItem[]> {
 export async function getTestimonials(): Promise<Testimonial[]> {
   if (USE_MOCK) return mockTestimonials;
   try {
-    const raw = await fetchStrapi<Array<{
-      id: number;
-      attributes: {
-        quote: string;
-        authorName: string;
-        authorRole: string;
-        authorInitials: string;
-        rating: number;
-      };
-    }>>("/testimonials?populate=*");
+    const raw = await fetchStrapi<Array<Record<string, any>>>(
+      "/testimonials?populate=*"
+    );
     return raw.map((item) => ({
       id: item.id,
-      ...item.attributes,
+      quote: item.quote,
+      authorName: item.authorName,
+      authorRole: item.authorRole,
+      authorInitials: item.authorInitials,
+      rating: item.rating,
     }));
   } catch {
     return mockTestimonials;
@@ -271,13 +238,13 @@ export async function getTestimonials(): Promise<Testimonial[]> {
 export async function getFAQ(): Promise<FAQItem[]> {
   if (USE_MOCK) return mockFAQ;
   try {
-    const raw = await fetchStrapi<Array<{
-      id: number;
-      attributes: { question: string; answer: string };
-    }>>("/faqs?sort=id:asc");
+    const raw = await fetchStrapi<Array<Record<string, any>>>(
+      "/faqs?sort=id:asc"
+    );
     return raw.map((item) => ({
       id: item.id,
-      ...item.attributes,
+      question: item.question,
+      answer: item.answer,
     }));
   } catch {
     return mockFAQ;
@@ -288,24 +255,17 @@ export async function getFAQ(): Promise<FAQItem[]> {
 export async function getThemenbereiche(): Promise<ThemenbereichItem[]> {
   if (USE_MOCK) return mockThemenbereiche;
   try {
-    const raw = await fetchStrapi<Array<{
-      id: number;
-      attributes: {
-        titel: string;
-        beschreibung: string;
-        reihenfolge: number;
-        slug: string;
-        bild: { data: { attributes: { url: string } } };
-      };
-    }>>("/themenbereiche?populate=*&sort=reihenfolge:asc");
+    const raw = await fetchStrapi<Array<Record<string, any>>>(
+      "/themenbereiche?populate=*&sort=reihenfolge:asc"
+    );
 
     return raw.map((item) => ({
       id: item.id,
-      titel: item.attributes.titel,
-      beschreibung: item.attributes.beschreibung,
-      bild: strapiImage(item.attributes.bild.data.attributes.url) || "",
-      slug: item.attributes.slug || item.attributes.titel.toLowerCase().replace(/\s+/g, "-"),
-      reihenfolge: item.attributes.reihenfolge,
+      titel: item.titel,
+      beschreibung: item.beschreibung,
+      bild: strapiImage(item.bild?.url) || "",
+      slug: item.slug || item.titel.toLowerCase().replace(/\s+/g, "-"),
+      reihenfolge: item.reihenfolge,
     }));
   } catch {
     return mockThemenbereiche;
