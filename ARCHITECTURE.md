@@ -3,24 +3,33 @@
 ## Three-Layer Architecture
 
 ```
-+------------------+      +-------------------+      +------------------+
-|                  |      |                   |      |                  |
-|     GitHub       | ---> |   Strapi Cloud    | ---> |     Vercel       |
-|  (Source Code)   |      |   (CMS + API)     |      |   (Frontend)     |
-|                  |      |                   |      |                  |
-+------------------+      +-------------------+      +------------------+
-   2 Repositories:           Admin Panel:              Next.js App:
-   - portfolio               - Inhalte pflegen         - SSG + ISR
-   - trainer-cms              - Bilder hochladen        - revalidate: 60s
-                              - REST API               - Mock-Fallback
++----------------------------------+
+|           GitHub                  |
+|   casimanodes/portfolio           |
+|   (1 Monorepo, 2 Projekte)       |
+|                                   |
+|   /          = Next.js Frontend   |
+|   /cms/      = Strapi CMS        |
++-------+----------------+---------+
+        |                |
+        v                v
++----------------+  +-------------------+
+|    Vercel      |  |   Strapi Cloud    |
+|  (Frontend)    |  |   (CMS + API)     |
+|                |  |                   |
+|  Root: /       |  |  Base Dir: /cms/  |
+|  SSG + ISR     |  |  Admin Panel      |
+|  revalidate:60 |  |  REST API         |
+|  Mock-Fallback |  |  PostgreSQL       |
++----------------+  +-------------------+
 ```
 
-### Repos
+### Monorepo-Struktur
 
-| Repo | Zweck | Deployment |
+| Pfad | Zweck | Deployment |
 |------|-------|------------|
-| `casimanodes/portfolio` | Next.js 16 Frontend (TypeScript, Tailwind v4) | Vercel |
-| `casimanodes/trainer-cms` | Strapi v5 CMS Backend (10 Content Types) | Strapi Cloud |
+| `/` (Root) | Next.js 16 Frontend (TypeScript, Tailwind v4) | Vercel (Root Directory: `/`) |
+| `/cms/` | Strapi v5 CMS Backend (10 Content Types) | Strapi Cloud (Base Directory: `/cms/`) |
 
 ---
 
@@ -103,7 +112,7 @@ Verwendet in: offer, schedule, themenbereich
 
 ## Kritische Dateien
 
-### Frontend (portfolio)
+### Frontend (Root /)
 
 | Datei | Zweck |
 |-------|-------|
@@ -116,15 +125,16 @@ Verwendet in: offer, schedule, themenbereich
 | `src/components/shared/DynamicFrameLayout.tsx` | 2x2 CSS-Grid Hero-Kacheln mit Hover. |
 | `.env.local` | Lokale Strapi URL + Token. |
 
-### Backend (trainer-cms)
+### CMS (/cms/)
 
 | Datei | Zweck |
 |-------|-------|
-| `src/index.ts` | Bootstrap Seed: erstellt + publiziert Daten + setzt Permissions. |
-| `src/api/*/content-types/*/schema.json` | Content-Type Definitionen. |
-| `config/middlewares.ts` | CORS + CSP fuer Vercel-Zugriff. |
-| `config/database.ts` | SQLite lokal, PostgreSQL in Strapi Cloud. |
-| `config/plugins.ts` | Cloudinary (nur Self-Hosting, nicht Strapi Cloud). |
+| `cms/src/index.ts` | Bootstrap Seed: erstellt + publiziert Daten + setzt Permissions. |
+| `cms/src/api/*/content-types/*/schema.json` | Content-Type Definitionen. |
+| `cms/config/middlewares.ts` | CORS + CSP fuer Vercel-Zugriff. |
+| `cms/config/database.ts` | SQLite lokal, PostgreSQL in Strapi Cloud. |
+| `cms/config/plugins.ts` | Cloudinary (nur Self-Hosting, nicht Strapi Cloud). |
+| `cms/package.json` | Strapi-Dependencies (getrennt vom Frontend). |
 
 ---
 
@@ -138,7 +148,7 @@ NEXT_PUBLIC_STRAPI_URL=https://dein-projekt.strapiapp.com
 STRAPI_API_TOKEN=                  # leer lassen wenn Public Permissions gesetzt
 ```
 
-**Strapi Cloud (Backend):**
+**Strapi Cloud (CMS):**
 ```
 FRONTEND_URL=https://deine-seite.vercel.app   # CORS
 # Rest wird von Strapi Cloud automatisch konfiguriert
@@ -230,7 +240,7 @@ NEXT_PUBLIC_STRAPI_URL gesetzt?
 |-----------|----------|-----------|
 | Lokal ohne Strapi | true | Mock-Daten, kein Netzwerk-Call |
 | Lokal mit Strapi (`localhost:1337`) | false | Echte Daten, Mock bei Fehler |
-| Vercel ohne STRAPI_URL | true | Mock-Daten (Erste Deployment) |
+| Vercel ohne STRAPI_URL | true | Mock-Daten (Erstes Deployment) |
 | Vercel mit STRAPI_URL | false | Strapi Cloud Daten, Mock bei Fehler |
 | Strapi Cloud down | false | Timeout -> Mock-Fallback |
 
@@ -256,7 +266,8 @@ src/lib/mock-data.ts
 ### Erstmalig: Strapi Cloud
 
 - [ ] https://cloud.strapi.io -> Anmelden mit GitHub
-- [ ] "Create Project" -> GitHub Repo `casimanodes/trainer-cms` verbinden
+- [ ] "Create Project" -> GitHub Repo `casimanodes/portfolio` verbinden
+- [ ] **Base Directory: `cms/`** einstellen
 - [ ] Branch: `main`, Region: EU (Frankfurt)
 - [ ] Warten bis Deploy gruen
 - [ ] Environment Variable in Strapi Cloud setzen:
@@ -269,34 +280,30 @@ src/lib/mock-data.ts
 ### Erstmalig: Vercel
 
 - [ ] https://vercel.com -> Repo `casimanodes/portfolio` importieren
+- [ ] Root Directory: `/` (Standard, NICHT aendern)
 - [ ] Environment Variable setzen:
   - `NEXT_PUBLIC_STRAPI_URL` = `https://dein-projekt.strapiapp.com`
 - [ ] Deploy
 - [ ] Seite pruefen: Werden Strapi-Daten angezeigt?
 
-### Nach jedem Push auf trainer-cms:
+### Nach jedem Push:
 
-- [ ] Strapi Cloud deployt automatisch von GitHub
-- [ ] Nach Deploy: Admin Panel pruefen
-- [ ] Neue Content Types? -> Im Admin Panel Permissions pruefen
+- [ ] Vercel deployt automatisch (Root /)
+- [ ] Strapi Cloud deployt automatisch (Base Dir /cms/)
+- [ ] Preview Deployments auf Vercel pruefen
+- [ ] Neue Content Types? -> Im Strapi Admin Panel Permissions pruefen
 - [ ] CORS-Aenderungen? -> FRONTEND_URL in Strapi Cloud Env pruefen
-
-### Nach jedem Push auf portfolio:
-
-- [ ] Vercel deployt automatisch von GitHub
-- [ ] Preview Deployment pruefen (*.vercel.app URL)
-- [ ] Neue Felder hinzugefuegt? -> types/index.ts UND mock-data.ts updaten
 
 ### Neue Section / Content Type hinzufuegen:
 
-1. **Strapi:** `src/api/{name}/content-types/{name}/schema.json` erstellen
-2. **Strapi:** Seed in `src/index.ts` erweitern (create + publish + permissions)
+1. **CMS:** `cms/src/api/{name}/content-types/{name}/schema.json` erstellen
+2. **CMS:** Seed in `cms/src/index.ts` erweitern (create + publish + permissions)
 3. **Frontend:** Interface in `src/types/index.ts` hinzufuegen
 4. **Frontend:** Fetch-Funktion in `src/lib/strapi.ts` hinzufuegen
 5. **Frontend:** Mock-Daten in `src/lib/mock-data.ts` hinzufuegen
 6. **Frontend:** Komponente in `src/components/sections/` erstellen
 7. **Frontend:** In `src/app/page.tsx` oder Route einbinden
-8. **Push:** Beide Repos pushen
+8. **Push:** Ein Push deployt beide Systeme
 
 ---
 
@@ -308,10 +315,10 @@ src/lib/mock-data.ts
 | 401 Unauthorized von Strapi | Token falsch oder nicht gesetzt | Public Permissions pruefen (Seed setzt sie automatisch) |
 | 403 Forbidden | CORS blockiert | `FRONTEND_URL` in Strapi Cloud setzen, Vercel-URL eintragen |
 | 404 auf API-Endpunkt | Content Type Name falsch | Endpunkt pruefen: `/api/offers` nicht `/api/offer` (Plural!) |
-| Bilder werden nicht angezeigt | URL-Auflosung falsch | `strapiImage()` pruefen, Strapi v5: `.url` direkt auf Media |
+| Bilder werden nicht angezeigt | URL-Aufloesung falsch | `strapiImage()` pruefen, Strapi v5: `.url` direkt auf Media |
 | Daten da aber leer (0 Eintraege) | Eintraege nicht publiziert | Im Admin Panel: "Publish" klicken, oder Seed pruefen |
 | Offers da aber keine Prices | `populate` fehlt | Query muss `?populate=*` enthalten |
-| Lokal: "fetch failed" | Strapi nicht gestartet | `cd trainer-cms && npm run develop` |
+| Lokal: "fetch failed" | Strapi nicht gestartet | `cd cms && npm run develop` |
 | Build Error: "export not found" | Mock-Data Export fehlt | Neuen Export in mock-data.ts hinzufuegen |
 | Neue Felder fehlen im Frontend | TypeScript Interface nicht aktualisiert | types/index.ts updaten |
 | Strapi Cloud Deploy failed | Build Error | Logs in Strapi Cloud Dashboard pruefen |
@@ -333,50 +340,103 @@ RICHTIG:      /api/hero-content   (Singular fuer Single Types)
 
 ---
 
-## Dateistruktur
+## Dateistruktur (Monorepo)
 
 ```
-Portfolio_webseite/                    trainer-cms/
-+-- src/                               +-- src/
-|   +-- app/                           |   +-- api/
-|   |   +-- page.tsx                   |   |   +-- offer/
-|   |   +-- layout.tsx                 |   |   |   +-- content-types/offer/schema.json
-|   |   +-- angebote/                  |   |   |   +-- controllers/offer.ts
-|   |   |   +-- page.tsx               |   |   |   +-- routes/offer.ts
-|   |   |   +-- [slug]/page.tsx        |   |   |   +-- services/offer.ts
-|   |   +-- faq/page.tsx               |   |   +-- price/
-|   |   +-- termine/page.tsx           |   |   +-- schedule/
-|   |   +-- ueber-mich/page.tsx        |   |   +-- testimonial/
-|   |   +-- kontakt/page.tsx           |   |   +-- faq/
-|   |   +-- impressum/page.tsx         |   |   +-- themenbereich/
-|   |   +-- datenschutz/page.tsx       |   |   +-- stat/
-|   +-- components/                    |   |   +-- hero-content/
-|   |   +-- sections/                  |   |   +-- about-content/
-|   |   |   +-- Hero.tsx               |   |   +-- site-setting/
-|   |   |   +-- Stats.tsx              |   +-- index.ts  (Seed Script)
-|   |   |   +-- AboutPreview.tsx       +-- config/
-|   |   |   +-- OffersGrid.tsx         |   +-- database.ts
-|   |   |   +-- Schedule.tsx           |   +-- middlewares.ts  (CORS)
-|   |   |   +-- Testimonials.tsx       |   +-- plugins.ts
-|   |   |   +-- FAQ.tsx                |   +-- server.ts
-|   |   |   +-- CTAStrip.tsx           |   +-- admin.ts
-|   |   |   +-- ContactSection.tsx     |   +-- api.ts
-|   |   +-- shared/                    +-- package.json
-|   |   |   +-- DynamicFrameLayout.tsx
-|   |   |   +-- RevealOnScroll.tsx
+casimanodes/portfolio/
+|
++-- src/                                    # Next.js Frontend
+|   +-- app/
+|   |   +-- page.tsx                        # Homepage (Promise.all Fetch)
+|   |   +-- layout.tsx                      # Root Layout (Fonts, Header, Footer)
+|   |   +-- angebote/
+|   |   |   +-- page.tsx                    # Angebotsuebersicht
+|   |   |   +-- [slug]/page.tsx             # Angebotsdetail (generateStaticParams)
+|   |   +-- faq/page.tsx
+|   |   +-- termine/page.tsx
+|   |   +-- ueber-mich/page.tsx
+|   |   +-- kontakt/page.tsx
+|   |   +-- impressum/page.tsx
+|   |   +-- datenschutz/page.tsx
+|   +-- components/
+|   |   +-- sections/
+|   |   |   +-- Hero.tsx                    # Hero mit DynamicFrameLayout
+|   |   |   +-- Stats.tsx                   # Zahlenleiste
+|   |   |   +-- AboutPreview.tsx            # Ueber mich
+|   |   |   +-- OffersGrid.tsx              # Angebotskarten
+|   |   |   +-- Schedule.tsx                # Terminkalender
+|   |   |   +-- Testimonials.tsx            # Bewertungen
+|   |   |   +-- FAQ.tsx                     # Haeufige Fragen
+|   |   |   +-- CTAStrip.tsx                # Call-to-Action Banner
+|   |   |   +-- ContactSection.tsx          # Kontaktformular
+|   |   +-- shared/
+|   |   |   +-- DynamicFrameLayout.tsx      # 2x2 Hover-Grid
+|   |   |   +-- RevealOnScroll.tsx          # Scroll-Animation
 |   |   +-- layout/
-|   |       +-- Header.tsx
+|   |       +-- Header.tsx                  # Navigation + Offers Dropdown
 |   |       +-- Footer.tsx
 |   +-- lib/
-|   |   +-- strapi.ts       (API Client)
-|   |   +-- mock-data.ts    (Fallback)
+|   |   +-- strapi.ts                       # API Client (Strapi v5)
+|   |   +-- mock-data.ts                    # Fallback-Daten
 |   +-- types/
-|       +-- index.ts         (Interfaces)
-+-- .env.local
-+-- .env.example
-+-- package.json
-+-- ARCHITECTURE.md  (diese Datei)
+|       +-- index.ts                        # TypeScript Interfaces
+|
++-- cms/                                    # Strapi v5 CMS
+|   +-- src/
+|   |   +-- index.ts                        # Seed + Public Permissions
+|   |   +-- api/
+|   |   |   +-- offer/
+|   |   |   |   +-- content-types/offer/schema.json
+|   |   |   |   +-- controllers/offer.ts
+|   |   |   |   +-- routes/offer.ts
+|   |   |   |   +-- services/offer.ts
+|   |   |   +-- price/                      # (gleiche Struktur)
+|   |   |   +-- schedule/
+|   |   |   +-- testimonial/
+|   |   |   +-- faq/
+|   |   |   +-- themenbereich/
+|   |   |   +-- stat/
+|   |   |   +-- hero-content/
+|   |   |   +-- about-content/
+|   |   |   +-- site-setting/
+|   +-- config/
+|   |   +-- database.ts                     # SQLite lokal / PostgreSQL Cloud
+|   |   +-- middlewares.ts                  # CORS fuer Vercel
+|   |   +-- plugins.ts                      # Cloudinary (optional)
+|   |   +-- server.ts
+|   |   +-- admin.ts
+|   |   +-- api.ts
+|   +-- package.json                        # Strapi-Dependencies
+|   +-- tsconfig.json
+|   +-- .env.example
+|   +-- .gitignore                          # Strapi-spezifisch
+|
++-- .env.local                              # Lokale Env Vars
++-- .env.example                            # Env Template
++-- .gitignore                              # Root + cms/ Ignores
++-- package.json                            # Next.js Dependencies
++-- ARCHITECTURE.md                         # Diese Datei
++-- CLAUDE.md                               # AI-Instruktionen
 ```
+
+---
+
+## Lokale Entwicklung
+
+```bash
+# Terminal 1: Strapi CMS starten
+cd cms
+npm install          # Nur beim ersten Mal
+npm run develop      # http://localhost:1337/admin
+
+# Terminal 2: Next.js Frontend starten
+npm run dev          # http://localhost:3000
+```
+
+Beim ersten Start von Strapi:
+1. Seed laeuft automatisch (erstellt + publiziert alle Daten)
+2. Admin Panel oeffnen -> Account erstellen
+3. Alle Inhalte sind bereits da und publiziert
 
 ---
 
@@ -388,11 +448,11 @@ Du arbeitest an einem Portfolio-Projekt mit dieser Architektur:
 STACK:
 - Frontend: Next.js 16 (App Router, TypeScript, Tailwind CSS v4, shadcn/ui Pattern)
 - CMS: Strapi v5 (REST API, PostgreSQL in Produktion, SQLite lokal)
-- Deployment: Vercel (Frontend) + Strapi Cloud (Backend)
-- Repos: casimanodes/portfolio (Frontend) + casimanodes/trainer-cms (Backend)
+- Deployment: Vercel (Frontend, Root /) + Strapi Cloud (CMS, Base Dir /cms/)
+- Monorepo: casimanodes/portfolio (Frontend: / + CMS: /cms/)
 
 WICHTIGE REGELN:
-- Strapi v5 gibt Felder DIREKT zurueck (item.title), NICHT unter .attributes (item.attributes.title)
+- Strapi v5 gibt Felder DIREKT zurueck (item.title), NICHT unter .attributes
 - Media in v5: image.url (NICHT image.data.attributes.url)
 - Collection Type Endpunkte sind PLURAL: /api/offers, /api/faqs
 - Single Type Endpunkte sind SINGULAR: /api/hero-content, /api/site-setting
@@ -406,12 +466,12 @@ DATENFLUSS:
 Strapi Admin Panel -> REST API -> src/lib/strapi.ts -> Server Components -> Props -> Section Components
 
 BEI AENDERUNGEN AN CONTENT TYPES:
-1. Schema in trainer-cms/src/api/{name}/content-types/{name}/schema.json
-2. Seed in trainer-cms/src/index.ts (createAndPublish + Permissions)
-3. Interface in portfolio/src/types/index.ts
-4. Fetch in portfolio/src/lib/strapi.ts
-5. Mock in portfolio/src/lib/mock-data.ts
-6. Komponente in portfolio/src/components/sections/
+1. Schema in cms/src/api/{name}/content-types/{name}/schema.json
+2. Seed in cms/src/index.ts (createAndPublish + Permissions)
+3. Interface in src/types/index.ts
+4. Fetch in src/lib/strapi.ts
+5. Mock in src/lib/mock-data.ts
+6. Komponente in src/components/sections/
 
 BEI FEHLERN:
 - Daten nicht sichtbar? -> draftAndPublish: Eintraege publiziert?
@@ -421,11 +481,12 @@ BEI FEHLERN:
 - Mock statt echte Daten? -> NEXT_PUBLIC_STRAPI_URL in Vercel gesetzt?
 
 DATEIEN DIE DU KENNEN MUSST:
-- portfolio/src/lib/strapi.ts        -> API Client (alle Fetch-Funktionen)
-- portfolio/src/lib/mock-data.ts     -> Fallback-Daten
-- portfolio/src/types/index.ts       -> TypeScript Interfaces
-- trainer-cms/src/index.ts           -> Seed + Permissions
-- trainer-cms/config/middlewares.ts   -> CORS Config
+- src/lib/strapi.ts             -> API Client (alle Fetch-Funktionen)
+- src/lib/mock-data.ts          -> Fallback-Daten
+- src/types/index.ts            -> TypeScript Interfaces
+- cms/src/index.ts              -> Seed + Permissions
+- cms/config/middlewares.ts     -> CORS Config
+- cms/src/api/*/content-types/*/schema.json -> Content Types
 
 Aufgabe: [HIER DEINE AUFGABE EINFUEGEN]
 ```
@@ -435,13 +496,14 @@ Aufgabe: [HIER DEINE AUFGABE EINFUEGEN]
 ## Schnelle Referenz: Strapi Cloud Setup
 
 ```
-1. cloud.strapi.io -> Anmelden
-2. "Create Project" -> GitHub: casimanodes/trainer-cms -> Main Branch
-3. Region: EU -> Deploy
-4. URL notieren (z.B. https://trainer-xyz.strapiapp.com)
-5. Strapi Cloud Settings -> Env Var: FRONTEND_URL = https://deine-vercel-url
-6. Admin Panel oeffnen -> Account erstellen
-7. Vercel -> portfolio Projekt -> Settings -> Env Vars:
+1. cloud.strapi.io -> Anmelden mit GitHub
+2. "Create Project" -> GitHub: casimanodes/portfolio
+3. Base Directory: cms/
+4. Branch: main, Region: EU -> Deploy
+5. URL notieren (z.B. https://trainer-xyz.strapiapp.com)
+6. Strapi Cloud Settings -> Env Var: FRONTEND_URL = https://deine-vercel-url
+7. Admin Panel oeffnen -> Account erstellen
+8. Vercel -> portfolio Projekt -> Settings -> Env Vars:
    NEXT_PUBLIC_STRAPI_URL = https://trainer-xyz.strapiapp.com
-8. Vercel Redeploy -> Fertig!
+9. Vercel Redeploy -> Fertig!
 ```
