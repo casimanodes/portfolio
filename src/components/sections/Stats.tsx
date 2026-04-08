@@ -1,13 +1,11 @@
 import RevealOnScroll from "@/components/shared/RevealOnScroll";
+import type { StatItem } from "@/types";
 
-const stats = [
-  { value: "9+", label: "Jahre Trainererfahrung" },
-  { value: "4", label: "Sportarten & Kurse" },
-  { value: "100+", label: "Unterrichtete Stunden" },
-  { value: "∞", label: "Motivation für Neues" },
-];
+interface StatsProps {
+  stats: StatItem[];
+}
 
-export default function Stats() {
+export default function Stats({ stats }: StatsProps) {
   return (
     <section className="section--sm">
       <div className="container-custom">
@@ -15,7 +13,7 @@ export default function Stats() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-[2px] bg-border rounded-[20px] overflow-hidden">
             {stats.map((stat) => (
               <div
-                key={stat.label}
+                key={stat.id}
                 className="bg-surface py-12 px-8 text-center transition-colors hover:bg-surface2"
               >
                 <div className="font-display text-[3.5rem] font-black text-primary leading-none mb-2">
@@ -28,9 +26,6 @@ export default function Stats() {
             ))}
           </div>
         </RevealOnScroll>
-        <p className="text-center text-muted text-[0.78rem] mt-3">
-          Platzhalter – bitte mit echtem Wert ersetzen
-        </p>
       </div>
     </section>
   );

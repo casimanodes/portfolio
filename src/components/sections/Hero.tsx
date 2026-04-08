@@ -1,15 +1,17 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import DynamicFrameLayout, { type ThemenbereichItem } from "@/components/shared/DynamicFrameLayout";
-import type { ScheduleItem } from "@/types";
+import type { ScheduleItem, HeroContent, StatItem } from "@/types";
 import { formatPrice } from "@/lib/utils";
 
 interface HeroProps {
+  content: HeroContent;
+  heroStats: StatItem[];
   nextSchedule?: ScheduleItem[];
   themenbereiche?: ThemenbereichItem[];
 }
 
-export default function Hero({ nextSchedule, themenbereiche = [] }: HeroProps) {
+export default function Hero({ content, heroStats, nextSchedule, themenbereiche = [] }: HeroProps) {
   const next = nextSchedule?.[0];
 
   return (
@@ -34,56 +36,42 @@ export default function Hero({ nextSchedule, themenbereiche = [] }: HeroProps) {
           <div>
             <div className="inline-flex items-center gap-2 px-4 py-2 border border-[rgba(91,141,239,0.25)] rounded-full text-[0.8rem] font-medium text-primary bg-primary-dim mb-6">
               <div className="w-1.5 h-1.5 rounded-full bg-primary animate-[pulse-dot_2s_infinite]" />
-              Lizenzierter Trainer & Berater · Hamburg
+              {content.tagline}
             </div>
 
             <h1 className="font-display text-[clamp(3rem,6vw,5.5rem)] font-black leading-[1.05] tracking-tight mb-6">
-              Sport. Denken.
+              {content.titleLine1}
               <br />
-              <em className="italic text-primary">Entwicklung.</em>
+              <em className="italic text-primary">{content.titleLine2}</em>
             </h1>
 
             <p className="text-[1.15rem] text-muted leading-relaxed mb-10 max-w-[480px]">
-              Knapp ein Jahrzehnt Erfahrung als Trainer, Lehrer und
-              Vereinsfunktionär. DenkSport, Schwimmen, Badminton und Schlagball
-              – professionell, individuell, leidenschaftlich.
+              {content.description}
             </p>
 
             <div className="flex items-center gap-4 flex-wrap">
               <Button size="lg" asChild>
-                <Link href="/kontakt?buchen=true">Kurs anfragen</Link>
+                <Link href={content.ctaPrimaryLink}>{content.ctaPrimaryText}</Link>
               </Button>
               <Button variant="outline" size="lg" asChild>
-                <Link href="/angebote">Alle Angebote</Link>
+                <Link href={content.ctaSecondaryLink}>{content.ctaSecondaryText}</Link>
               </Button>
             </div>
 
-            <div className="flex gap-8 mt-14 pt-10 border-t border-border">
-              <div>
-                <div className="font-display text-4xl font-bold text-primary leading-none">
-                  9+
-                </div>
-                <div className="text-[0.82rem] text-muted mt-1">
-                  Jahre Erfahrung
-                </div>
+            {heroStats.length > 0 && (
+              <div className="flex gap-8 mt-14 pt-10 border-t border-border">
+                {heroStats.slice(0, 3).map((stat) => (
+                  <div key={stat.id}>
+                    <div className="font-display text-4xl font-bold text-primary leading-none">
+                      {stat.value}
+                    </div>
+                    <div className="text-[0.82rem] text-muted mt-1">
+                      {stat.label}
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div>
-                <div className="font-display text-4xl font-bold text-primary leading-none">
-                  4
-                </div>
-                <div className="text-[0.82rem] text-muted mt-1">
-                  Disziplinen
-                </div>
-              </div>
-              <div>
-                <div className="font-display text-4xl font-bold text-primary leading-none">
-                  1.
-                </div>
-                <div className="text-[0.82rem] text-muted mt-1">
-                  Vorstand Schlagball HH
-                </div>
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Right: Dynamic Frame Grid */}

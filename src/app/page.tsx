@@ -7,22 +7,40 @@ import Testimonials from "@/components/sections/Testimonials";
 import FAQSection from "@/components/sections/FAQ";
 import CTAStrip from "@/components/sections/CTAStrip";
 import ContactSection from "@/components/sections/ContactSection";
-import { getOffers, getSchedule, getTestimonials, getFAQ, getThemenbereiche } from "@/lib/strapi";
+import {
+  getOffers,
+  getSchedule,
+  getTestimonials,
+  getFAQ,
+  getThemenbereiche,
+  getHeroContent,
+  getStats,
+  getAboutContent,
+} from "@/lib/strapi";
 
 export default async function HomePage() {
-  const [offers, schedule, testimonials, faq, themenbereiche] = await Promise.all([
-    getOffers(),
-    getSchedule(),
-    getTestimonials(),
-    getFAQ(),
-    getThemenbereiche(),
-  ]);
+  const [offers, schedule, testimonials, faq, themenbereiche, heroContent, stats, about] =
+    await Promise.all([
+      getOffers(),
+      getSchedule(),
+      getTestimonials(),
+      getFAQ(),
+      getThemenbereiche(),
+      getHeroContent(),
+      getStats(),
+      getAboutContent(),
+    ]);
 
   return (
     <>
-      <Hero nextSchedule={schedule} themenbereiche={themenbereiche} />
-      <AboutPreview />
-      <Stats />
+      <Hero
+        content={heroContent}
+        heroStats={stats}
+        nextSchedule={schedule}
+        themenbereiche={themenbereiche}
+      />
+      <AboutPreview about={about} />
+      <Stats stats={stats} />
       <OffersGrid offers={offers} />
       <Schedule schedule={schedule} />
       <Testimonials testimonials={testimonials} />
