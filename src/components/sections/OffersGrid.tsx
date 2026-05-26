@@ -2,14 +2,15 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import RevealOnScroll from "@/components/shared/RevealOnScroll";
-import type { Offer } from "@/types";
+import type { Offer, OffersSectionContent } from "@/types";
 import { formatPrice } from "@/lib/utils";
 
 interface OffersGridProps {
   offers: Offer[];
+  section: OffersSectionContent;
 }
 
-export default function OffersGrid({ offers }: OffersGridProps) {
+export default function OffersGrid({ offers, section }: OffersGridProps) {
   const featured = offers[0];
   const rest = offers.slice(1);
 
@@ -17,12 +18,9 @@ export default function OffersGrid({ offers }: OffersGridProps) {
     <section className="section" id="angebote">
       <div className="container-custom">
         <RevealOnScroll className="text-center max-w-[640px] mx-auto">
-          <div className="label-tag justify-center pl-8">Meine Angebote</div>
-          <h2 className="h-lg">Was ich dir bieten kann</h2>
-          <p className="text-muted mt-4 text-[1.05rem]">
-            Von Zauberwürfel über Schach bis Vereinstraining – vier Bereiche,
-            eine Philosophie: individuelle Förderung, echte Entwicklung.
-          </p>
+          <div className="label-tag justify-center pl-8">{section.label}</div>
+          <h2 className="h-lg">{section.heading}</h2>
+          <p className="text-muted mt-4 text-[1.05rem]">{section.intro}</p>
         </RevealOnScroll>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-16">

@@ -1,0 +1,17 @@
+{
+  "kind": "singleType",
+  "collectionName": "offers_sections",
+  "info": {
+    "singularName": "offers-section",
+    "pluralName": "offers-sections",
+    "displayName": "Offers Section",
+    "description": "Bereich 'Was ich dir bieten kann' auf der Startseite"
+  },
+  "options": { "draftAndPublish": true },
+  "pluginOptions": {},
+  "attributes": {
+    "label": { "type": "string" },
+    "heading": { "type": "string" },
+    "intro": { "type": "text" }
+  }
+}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { getHeaderContent } from "@/lib/strapi";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -24,11 +25,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const headerContent = await getHeaderContent();
+
   return (
     <html lang="de">
       <head>
@@ -44,7 +47,7 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body">
-        <Header />
+        <Header content={headerContent} />
         <main>{children}</main>
         <Footer />
       </body>

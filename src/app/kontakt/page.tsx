@@ -1,4 +1,5 @@
 import ContactSection from "@/components/sections/ContactSection";
+import { getContactSection, getSiteSettings } from "@/lib/strapi";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -6,10 +7,14 @@ export const metadata: Metadata = {
   description: "Kontaktiere mich für Kursanfragen, Vereinsbeitritt oder allgemeine Fragen.",
 };
 
-export default function KontaktPage() {
+export default async function KontaktPage() {
+  const [content, settings] = await Promise.all([
+    getContactSection(),
+    getSiteSettings(),
+  ]);
   return (
     <div className="pt-16">
-      <ContactSection />
+      <ContactSection content={content} settings={settings} />
     </div>
   );
 }

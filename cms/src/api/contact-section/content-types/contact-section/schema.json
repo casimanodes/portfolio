@@ -1,0 +1,27 @@
+{
+  "kind": "singleType",
+  "collectionName": "contact_sections",
+  "info": {
+    "singularName": "contact-section",
+    "pluralName": "contact-sections",
+    "displayName": "Contact Section",
+    "description": "Kontakt-Bereich Inhalte (Heading, Labels, Interest-Optionen)"
+  },
+  "options": { "draftAndPublish": true },
+  "pluginOptions": {},
+  "attributes": {
+    "label": { "type": "string" },
+    "heading": { "type": "string" },
+    "intro": { "type": "text" },
+    "emailLabel": { "type": "string" },
+    "locationLabel": { "type": "string" },
+    "responseLabel": { "type": "string" },
+    "socialLabel": { "type": "string" },
+    "formHeading": { "type": "string" },
+    "formIntro": { "type": "string" },
+    "interests": { "type": "text" },
+    "submitLabel": { "type": "string" },
+    "successMessage": { "type": "text" },
+    "consentText": { "type": "text" }
+  }
+}

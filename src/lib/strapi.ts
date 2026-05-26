@@ -8,6 +8,9 @@ import type {
   AboutContent,
   SiteSettings,
   BadgeColor,
+  HeaderContent,
+  OffersSectionContent,
+  ContactSectionContent,
 } from "@/types";
 import type { ThemenbereichItem } from "@/components/shared/DynamicFrameLayout";
 import {
@@ -20,6 +23,9 @@ import {
   mockStats,
   mockAbout,
   mockSiteSettings,
+  mockHeader,
+  mockOffersSection,
+  mockContactSection,
 } from "./mock-data";
 
 const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
@@ -55,6 +61,73 @@ async function fetchStrapi<T>(endpoint: string): Promise<T> {
 
   const json = await res.json();
   return json.data;
+}
+
+// ── Header Content (Single Type) ──
+export async function getHeaderContent(): Promise<HeaderContent> {
+  if (USE_MOCK) return mockHeader;
+  try {
+    const raw = await fetchStrapi<Record<string, any>>("/header-content?populate=*");
+    return {
+      brandName: raw.brandName || mockHeader.brandName,
+      brandSubtitle: raw.brandSubtitle || mockHeader.brandSubtitle,
+      logoText: raw.logoText || mockHeader.logoText,
+      moreLabel: raw.moreLabel || mockHeader.moreLabel,
+      ctaLabel: raw.ctaLabel || mockHeader.ctaLabel,
+      ctaLink: raw.ctaLink || mockHeader.ctaLink,
+    };
+  } catch {
+    return mockHeader;
+  }
+}
+
+// ── Offers Section (Single Type) ──
+export async function getOffersSection(): Promise<OffersSectionContent> {
+  if (USE_MOCK) return mockOffersSection;
+  try {
+    const raw = await fetchStrapi<Record<string, any>>("/offers-section?populate=*");
+    return {
+      label: raw.label || mockOffersSection.label,
+      heading: raw.heading || mockOffersSection.heading,
+      intro: raw.intro || mockOffersSection.intro,
+    };
+  } catch {
+    return mockOffersSection;
+  }
+}
+
+// ── Contact Section (Single Type) ──
+export async function getContactSection(): Promise<ContactSectionContent> {
+  if (USE_MOCK) return mockContactSection;
+  try {
+    const raw = await fetchStrapi<Record<string, any>>("/contact-section?populate=*");
+    const interestsRaw = raw.interests;
+    let interests: string[];
+    if (Array.isArray(interestsRaw)) {
+      interests = interestsRaw;
+    } else if (typeof interestsRaw === "string") {
+      interests = interestsRaw.split("\n").map((s) => s.trim()).filter(Boolean);
+    } else {
+      interests = mockContactSection.interests;
+    }
+    return {
+      label: raw.label || mockContactSection.label,
+      heading: raw.heading || mockContactSection.heading,
+      intro: raw.intro || mockContactSection.intro,
+      emailLabel: raw.emailLabel || mockContactSection.emailLabel,
+      locationLabel: raw.locationLabel || mockContactSection.locationLabel,
+      responseLabel: raw.responseLabel || mockContactSection.responseLabel,
+      socialLabel: raw.socialLabel || mockContactSection.socialLabel,
+      formHeading: raw.formHeading || mockContactSection.formHeading,
+      formIntro: raw.formIntro || mockContactSection.formIntro,
+      interests,
+      submitLabel: raw.submitLabel || mockContactSection.submitLabel,
+      successMessage: raw.successMessage || mockContactSection.successMessage,
+      consentText: raw.consentText || mockContactSection.consentText,
+    };
+  } catch {
+    return mockContactSection;
+  }
 }
 
 // ── Site Settings (Single Type) ──

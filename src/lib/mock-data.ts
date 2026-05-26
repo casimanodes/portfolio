@@ -7,8 +7,54 @@ import type {
   StatItem,
   AboutContent,
   SiteSettings,
+  HeaderContent,
+  OffersSectionContent,
+  ContactSectionContent,
 } from "@/types";
 import type { ThemenbereichItem } from "@/components/shared/DynamicFrameLayout";
+
+// ── Header ──
+export const mockHeader: HeaderContent = {
+  brandName: "Trainer Hamburg",
+  brandSubtitle: "Sport & Denken",
+  logoText: "T",
+  moreLabel: "Mehr",
+  ctaLabel: "Kurs buchen",
+  ctaLink: "/kontakt?buchen=true",
+};
+
+// ── Offers Section ──
+export const mockOffersSection: OffersSectionContent = {
+  label: "Meine Angebote",
+  heading: "Was ich dir bieten kann",
+  intro:
+    "Von Zauberwürfel über Schach bis Vereinstraining – vier Bereiche, eine Philosophie: individuelle Förderung, echte Entwicklung.",
+};
+
+// ── Contact Section ──
+export const mockContactSection: ContactSectionContent = {
+  label: "Kontakt",
+  heading: "Lass uns sprechen",
+  intro:
+    "Fragen zu einem Kurs, Vereinsbeitritt oder einfach Hallo? Ich antworte innerhalb von 48 Stunden.",
+  emailLabel: "E-Mail",
+  locationLabel: "Standort",
+  responseLabel: "Antwortzeit",
+  socialLabel: "Social Media",
+  formHeading: "Nachricht senden",
+  formIntro: "* Pflichtfelder",
+  interests: [
+    "Bitte wählen...",
+    "Zauberwürfel",
+    "Schach",
+    "Schlagball Hamburg (Verein)",
+    "Badminton-Training",
+    "Beratung / Sonstiges",
+  ],
+  submitLabel: "Nachricht senden →",
+  successMessage: "✅ Deine Nachricht wurde gesendet! Ich melde mich bald.",
+  consentText: "Mit dem Absenden stimmst du der Datenschutzerklärung zu.",
+};
 
 // ── Site Settings ──
 export const mockSiteSettings: SiteSettings = {

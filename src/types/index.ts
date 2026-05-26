@@ -102,6 +102,40 @@ export interface TagItem {
   color: BadgeColor;
 }
 
+// ── Header ──
+export interface HeaderContent {
+  brandName: string;
+  brandSubtitle: string;
+  logoText: string;
+  moreLabel: string;
+  ctaLabel: string;
+  ctaLink: string;
+}
+
+// ── Offers Section (Startseite "Was ich dir bieten kann") ──
+export interface OffersSectionContent {
+  label: string;
+  heading: string;
+  intro: string;
+}
+
+// ── Contact Section ──
+export interface ContactSectionContent {
+  label: string;
+  heading: string;
+  intro: string;
+  emailLabel: string;
+  locationLabel: string;
+  responseLabel: string;
+  socialLabel: string;
+  formHeading: string;
+  formIntro: string;
+  interests: string[];
+  submitLabel: string;
+  successMessage: string;
+  consentText: string;
+}
+
 // ── Seitenweite Einstellungen ──
 export interface SiteSettings {
   siteName: string;

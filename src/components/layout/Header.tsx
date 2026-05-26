@@ -1,9 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import type { HeaderContent } from "@/types";
+
+interface HeaderProps {
+  content: HeaderContent;
+}
 
 const offerLinks = [
   { href: "/angebote/zauberwuerfel", label: "Zauberwürfel", icon: "🧩" },
@@ -12,16 +17,17 @@ const offerLinks = [
   { href: "/angebote/badminton", label: "Badminton", icon: "🏸" },
 ];
 
-const navLinks = [
+const moreLinks = [
   { href: "/ueber-mich", label: "Über mich" },
   { href: "/termine", label: "Termine" },
-  { href: "/kontakt", label: "Kontakt" },
   { href: "/faq", label: "FAQ" },
 ];
 
-export default function Header() {
+export default function Header({ content }: HeaderProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const moreRef = useRef<HTMLLIElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -33,6 +39,17 @@ export default function Header() {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
+
+  useEffect(() => {
+    if (!moreOpen) return;
+    const onDocClick = (e: MouseEvent) => {
+      if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
+        setMoreOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, [moreOpen]);
 
   return (
     <>
@@ -47,19 +64,18 @@ export default function Header() {
           <div className="flex items-center justify-between gap-4">
             <Link href="/" className="flex items-center gap-3 shrink-0">
               <div className="w-10 h-10 bg-primary rounded-[10px] flex items-center justify-center font-display font-black text-xl text-white">
-                T
+                {content.logoText}
               </div>
               <div>
                 <div className="font-display font-bold text-[1.1rem]">
-                  Trainer Hamburg
+                  {content.brandName}
                 </div>
                 <div className="text-[0.7rem] text-muted tracking-widest uppercase -mt-0.5">
-                  Sport & Denken
+                  {content.brandSubtitle}
                 </div>
               </div>
             </Link>
 
-            {/* Angebote direkt sichtbar */}
             <ul className="hidden lg:flex items-center gap-1 flex-1 justify-center">
               {offerLinks.map((link) => (
                 <li key={link.href}>
@@ -73,21 +89,39 @@ export default function Header() {
                 </li>
               ))}
               <li className="mx-2 h-6 w-px bg-border" aria-hidden />
-              {navLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="px-3 py-2 rounded-lg text-[0.9rem] font-medium text-muted hover:text-text hover:bg-surface transition-all duration-300"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
+              <li className="relative" ref={moreRef}>
+                <button
+                  type="button"
+                  className="flex items-center gap-1 px-3 py-2 rounded-lg text-[0.9rem] font-medium text-muted hover:text-text hover:bg-surface transition-all duration-300"
+                  onClick={() => setMoreOpen((v) => !v)}
+                  aria-expanded={moreOpen}
+                  aria-haspopup="true"
+                >
+                  {content.moreLabel}
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform ${moreOpen ? "rotate-180" : ""}`}
+                  />
+                </button>
+                {moreOpen && (
+                  <div className="absolute top-full right-0 mt-2 w-52 bg-surface border border-border rounded-xl p-2 shadow-[0_4px_24px_rgba(0,0,0,0.4)] z-50">
+                    {moreLinks.map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className="block px-4 py-2.5 rounded-lg text-[0.9rem] text-muted hover:text-text hover:bg-surface2 transition-all"
+                        onClick={() => setMoreOpen(false)}
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </li>
             </ul>
 
             <div className="hidden lg:flex items-center gap-3 shrink-0">
               <Button size="sm" asChild>
-                <Link href="/kontakt?buchen=true">Kurs buchen</Link>
+                <Link href={content.ctaLink}>{content.ctaLabel}</Link>
               </Button>
             </div>
 
@@ -106,7 +140,6 @@ export default function Header() {
         </div>
       </nav>
 
-      {/* Mobile Menu */}
       {mobileOpen && (
         <div className="fixed inset-0 bg-bg z-[999] pt-24 px-6 pb-10 flex flex-col gap-2 overflow-y-auto lg:hidden">
           <div className="text-[0.7rem] text-muted tracking-widest uppercase font-semibold mb-2 px-5">
@@ -123,7 +156,10 @@ export default function Header() {
             </Link>
           ))}
           <div className="border-t border-border my-2" />
-          {navLinks.map((link) => (
+          <div className="text-[0.7rem] text-muted tracking-widest uppercase font-semibold mb-2 px-5">
+            {content.moreLabel}
+          </div>
+          {moreLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -135,13 +171,8 @@ export default function Header() {
           ))}
           <div className="mt-6 flex flex-col gap-3">
             <Button size="lg" asChild>
-              <Link href="/kontakt?buchen=true" onClick={() => setMobileOpen(false)}>
-                Kurs buchen
-              </Link>
-            </Button>
-            <Button variant="outline" size="lg" asChild>
-              <Link href="/kontakt" onClick={() => setMobileOpen(false)}>
-                Kontakt
+              <Link href={content.ctaLink} onClick={() => setMobileOpen(false)}>
+                {content.ctaLabel}
               </Link>
             </Button>
           </div>

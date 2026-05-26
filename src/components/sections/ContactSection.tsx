@@ -4,15 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import RevealOnScroll from "@/components/shared/RevealOnScroll";
-
-const interests = [
-  "Bitte wählen...",
-  "Zauberwürfel",
-  "Schach",
-  "Schlagball Hamburg (Verein)",
-  "Badminton-Training",
-  "Beratung / Sonstiges",
-];
+import type { ContactSectionContent, SiteSettings } from "@/types";
 
 const socialLinks = [
   { href: "https://instagram.com", icon: "📷", label: "Instagram" },
@@ -21,7 +13,12 @@ const socialLinks = [
   { href: "#", icon: "🎵", label: "TikTok" },
 ];
 
-export default function ContactSection() {
+interface ContactSectionProps {
+  content: ContactSectionContent;
+  settings: SiteSettings;
+}
+
+export default function ContactSection({ content, settings }: ContactSectionProps) {
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -35,11 +32,10 @@ export default function ContactSection() {
       <div className="container-custom">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-start">
           <RevealOnScroll>
-            <div className="label-tag">Kontakt</div>
-            <h2 className="h-lg mb-6">Lass uns sprechen</h2>
+            <div className="label-tag">{content.label}</div>
+            <h2 className="h-lg mb-6">{content.heading}</h2>
             <p className="text-muted text-[1.05rem] mb-10 leading-relaxed">
-              Fragen zu einem Kurs, Vereinsbeitritt oder einfach Hallo? Ich
-              antworte innerhalb von 48 Stunden.
+              {content.intro}
             </p>
 
             <div className="flex flex-col gap-6">
@@ -49,14 +45,9 @@ export default function ContactSection() {
                 </div>
                 <div>
                   <div className="text-[0.78rem] text-muted tracking-widest uppercase font-semibold">
-                    E-Mail
+                    {content.emailLabel}
                   </div>
-                  <div className="font-medium mt-0.5">
-                    trainer@example.com{" "}
-                    <em className="text-muted not-italic text-[0.8rem]">
-                      [Platzhalter]
-                    </em>
-                  </div>
+                  <div className="font-medium mt-0.5">{settings.email}</div>
                 </div>
               </div>
 
@@ -66,11 +57,9 @@ export default function ContactSection() {
                 </div>
                 <div>
                   <div className="text-[0.78rem] text-muted tracking-widest uppercase font-semibold">
-                    Standort
+                    {content.locationLabel}
                   </div>
-                  <div className="font-medium mt-0.5">
-                    Hamburg, Deutschland
-                  </div>
+                  <div className="font-medium mt-0.5">{settings.location}</div>
                 </div>
               </div>
 
@@ -80,18 +69,16 @@ export default function ContactSection() {
                 </div>
                 <div>
                   <div className="text-[0.78rem] text-muted tracking-widest uppercase font-semibold">
-                    Antwortzeit
+                    {content.responseLabel}
                   </div>
-                  <div className="font-medium mt-0.5">
-                    Innerhalb von 48 Stunden
-                  </div>
+                  <div className="font-medium mt-0.5">{settings.responseTime}</div>
                 </div>
               </div>
             </div>
 
             <div className="mt-8">
               <div className="text-[0.82rem] text-muted mb-3 tracking-widest uppercase font-semibold">
-                Social Media
+                {content.socialLabel}
               </div>
               <div className="flex gap-3">
                 {socialLinks.map((s) => (
@@ -112,10 +99,8 @@ export default function ContactSection() {
 
           <RevealOnScroll delay={2}>
             <div className="bg-surface border border-border rounded-[20px] p-9">
-              <h3 className="h-sm mb-1.5">Nachricht senden</h3>
-              <p className="text-[0.85rem] text-muted mb-7">
-                * Pflichtfelder
-              </p>
+              <h3 className="h-sm mb-1.5">{content.formHeading}</h3>
+              <p className="text-[0.85rem] text-muted mb-7">{content.formIntro}</p>
               <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-2">
@@ -162,7 +147,7 @@ export default function ContactSection() {
                     required
                     className="bg-surface border-[1.5px] border-border rounded-xl px-4 py-3.5 text-text font-body text-[0.95rem] focus:outline-none focus:border-primary transition-colors appearance-none cursor-pointer"
                   >
-                    {interests.map((opt) => (
+                    {content.interests.map((opt) => (
                       <option key={opt} value={opt} className="bg-surface">
                         {opt}
                       </option>
@@ -183,20 +168,26 @@ export default function ContactSection() {
 
                 {submitted && (
                   <div className="bg-[rgba(76,201,122,0.1)] border border-accent-green rounded-xl px-5 py-4 text-accent-green font-medium flex items-center gap-3">
-                    ✅ Deine Nachricht wurde gesendet! Ich melde mich bald.
+                    {content.successMessage}
                   </div>
                 )}
 
                 <Button type="submit" size="lg" className="w-full">
-                  Nachricht senden →
+                  {content.submitLabel}
                 </Button>
 
                 <p className="text-[0.78rem] text-muted text-center">
-                  Mit dem Absenden stimmst du der{" "}
-                  <Link href="/datenschutz" className="text-primary hover:underline">
-                    Datenschutzerklärung
-                  </Link>{" "}
-                  zu.
+                  {content.consentText.includes("Datenschutzerklärung") ? (
+                    <>
+                      {content.consentText.split("Datenschutzerklärung")[0]}
+                      <Link href="/datenschutz" className="text-primary hover:underline">
+                        Datenschutzerklärung
+                      </Link>
+                      {content.consentText.split("Datenschutzerklärung")[1]}
+                    </>
+                  ) : (
+                    content.consentText
+                  )}
                 </p>
               </form>
             </div>

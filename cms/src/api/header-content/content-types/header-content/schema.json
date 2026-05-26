@@ -1,0 +1,20 @@
+{
+  "kind": "singleType",
+  "collectionName": "header_contents",
+  "info": {
+    "singularName": "header-content",
+    "pluralName": "header-contents",
+    "displayName": "Header",
+    "description": "Header-Bereich Inhalte (Brand, Nav-Label, CTA)"
+  },
+  "options": { "draftAndPublish": true },
+  "pluginOptions": {},
+  "attributes": {
+    "brandName": { "type": "string" },
+    "brandSubtitle": { "type": "string" },
+    "logoText": { "type": "string" },
+    "moreLabel": { "type": "string" },
+    "ctaLabel": { "type": "string" },
+    "ctaLink": { "type": "string" }
+  }
+}
