@@ -8,7 +8,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Alle Angebote – Trainer Hamburg",
-  description: "DenkSport, Schlagball, Schwimmen, Badminton – alle Kursangebote im Überblick.",
+  description: "Zauberwürfel, Schach, Schlagball, Badminton – alle Kursangebote im Überblick.",
 };
 
 export default async function AngebotePage() {
@@ -64,9 +64,21 @@ export default async function AngebotePage() {
                     <Button asChild>
                       <Link href={`/angebote/${offer.slug}`}>Details & Preise</Link>
                     </Button>
-                    <Button variant="outline" asChild>
-                      <Link href={offer.ctaLink}>{offer.ctaText}</Link>
-                    </Button>
+                    {offer.externalLink ? (
+                      <Button variant="outline" asChild>
+                        <a
+                          href={offer.externalLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {offer.ctaText}
+                        </a>
+                      </Button>
+                    ) : (
+                      <Button variant="outline" asChild>
+                        <Link href={offer.ctaLink}>{offer.ctaText}</Link>
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>

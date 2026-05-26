@@ -1,9 +1,9 @@
 import Link from "next/link";
 
 const offerLinks = [
-  { href: "/angebote/denksport", label: "DenkSport" },
+  { href: "/angebote/zauberwuerfel", label: "Zauberwürfel" },
+  { href: "/angebote/schach", label: "Schach" },
   { href: "/angebote/schlagball", label: "Schlagball Hamburg" },
-  { href: "/angebote/schwimmen", label: "Schwimmunterricht" },
   { href: "/angebote/badminton", label: "Badminton-Training" },
 ];
 

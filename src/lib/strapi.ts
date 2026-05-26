@@ -174,6 +174,7 @@ export async function getOffers(): Promise<Offer[]> {
       image: strapiImage(item.image?.url),
       ctaText: item.ctaText,
       ctaLink: item.ctaLink,
+      externalLink: item.externalLink || undefined,
     }));
   } catch {
     console.warn("Strapi nicht erreichbar, verwende Mock-Daten.");

@@ -15,6 +15,7 @@ export interface Offer {
   image?: string;
   ctaText: string;
   ctaLink: string;
+  externalLink?: string;
 }
 
 export interface PriceOption {

@@ -7,11 +7,10 @@ import RevealOnScroll from "@/components/shared/RevealOnScroll";
 
 const interests = [
   "Bitte wählen...",
-  "DenkSport – Zauberwürfel",
-  "DenkSport – Schach",
-  "Schwimmunterricht",
-  "Badminton-Training",
+  "Zauberwürfel",
+  "Schach",
   "Schlagball Hamburg (Verein)",
+  "Badminton-Training",
   "Beratung / Sonstiges",
 ];
 

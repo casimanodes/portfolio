@@ -74,9 +74,21 @@ export default async function OfferDetailPage({ params }: Props) {
                 {offer.longDescription}
               </p>
               <div className="flex gap-3 flex-wrap">
-                <Button size="lg" asChild>
-                  <Link href={offer.ctaLink}>{offer.ctaText}</Link>
-                </Button>
+                {offer.externalLink ? (
+                  <Button size="lg" asChild>
+                    <a
+                      href={offer.externalLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {offer.ctaText}
+                    </a>
+                  </Button>
+                ) : (
+                  <Button size="lg" asChild>
+                    <Link href={offer.ctaLink}>{offer.ctaText}</Link>
+                  </Button>
+                )}
                 <Button variant="outline" size="lg" asChild>
                   <Link href="/termine">Termine ansehen</Link>
                 </Button>
@@ -184,9 +196,21 @@ export default async function OfferDetailPage({ params }: Props) {
               Einstieg für dich.
             </p>
             <div className="flex gap-3 justify-center flex-wrap">
-              <Button size="lg" asChild>
-                <Link href={offer.ctaLink}>{offer.ctaText}</Link>
-              </Button>
+              {offer.externalLink ? (
+                <Button size="lg" asChild>
+                  <a
+                    href={offer.externalLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {offer.ctaText}
+                  </a>
+                </Button>
+              ) : (
+                <Button size="lg" asChild>
+                  <Link href={offer.ctaLink}>{offer.ctaText}</Link>
+                </Button>
+              )}
               <Button variant="outline" size="lg" asChild>
                 <Link href="/kontakt">Kontakt aufnehmen</Link>
               </Button>

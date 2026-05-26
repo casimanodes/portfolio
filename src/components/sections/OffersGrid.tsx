@@ -20,8 +20,8 @@ export default function OffersGrid({ offers }: OffersGridProps) {
           <div className="label-tag justify-center pl-8">Meine Angebote</div>
           <h2 className="h-lg">Was ich dir bieten kann</h2>
           <p className="text-muted mt-4 text-[1.05rem]">
-            Von DenkSport bis Vereinstraining – vier Bereiche, eine Philosophie:
-            individuelle Förderung, echte Entwicklung.
+            Von Zauberwürfel über Schach bis Vereinstraining – vier Bereiche,
+            eine Philosophie: individuelle Förderung, echte Entwicklung.
           </p>
         </RevealOnScroll>
 
@@ -60,11 +60,23 @@ export default function OffersGrid({ offers }: OffersGridProps) {
                     </div>
                   )}
                   <div className="flex gap-3 flex-wrap">
-                    <Button asChild>
-                      <Link href={`/angebote/${featured.slug}`}>
-                        {featured.ctaText}
-                      </Link>
-                    </Button>
+                    {featured.externalLink ? (
+                      <Button asChild>
+                        <a
+                          href={featured.externalLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {featured.ctaText}
+                        </a>
+                      </Button>
+                    ) : (
+                      <Button asChild>
+                        <Link href={`/angebote/${featured.slug}`}>
+                          {featured.ctaText}
+                        </Link>
+                      </Button>
+                    )}
                     <Button variant="outline" asChild>
                       <Link href={`/angebote/${featured.slug}`}>
                         Details & Preise
@@ -110,9 +122,26 @@ export default function OffersGrid({ offers }: OffersGridProps) {
                     </div>
                   )}
                   <div className="flex gap-3 flex-wrap">
-                    <Button asChild>
+                    {offer.externalLink ? (
+                      <Button asChild>
+                        <a
+                          href={offer.externalLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {offer.ctaText}
+                        </a>
+                      </Button>
+                    ) : (
+                      <Button asChild>
+                        <Link href={`/angebote/${offer.slug}`}>
+                          {offer.ctaText}
+                        </Link>
+                      </Button>
+                    )}
+                    <Button variant="outline" asChild>
                       <Link href={`/angebote/${offer.slug}`}>
-                        {offer.ctaText}
+                        Details
                       </Link>
                     </Button>
                   </div>

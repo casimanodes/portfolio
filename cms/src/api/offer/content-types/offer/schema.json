@@ -22,6 +22,7 @@
     "features": { "type": "text" },
     "ctaText": { "type": "string" },
     "ctaLink": { "type": "string" },
+    "externalLink": { "type": "string" },
     "image": { "type": "media", "multiple": false, "allowedTypes": ["images"] },
     "prices": { "type": "relation", "relation": "oneToMany", "target": "api::price.price", "mappedBy": "offer" }
   }

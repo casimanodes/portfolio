@@ -10,8 +10,8 @@ export const metadata: Metadata = {
 
 const timeline = [
   { year: "2016+", title: "Start als Trainer", desc: "Beginn der Trainertätigkeit in verschiedenen Sportarten" },
-  { year: "2020", title: "Schwimmlehrer", desc: "Start des Schwimmunterrichts für Kinder und Erwachsene" },
-  { year: "2022", title: "DenkSport-Kurse", desc: "Einführung der Zauberwürfel- und Schachkurse" },
+  { year: "2020", title: "Badminton-Trainingsgruppe", desc: "Aufbau und Leitung der eigenen Badminton-Trainingsgruppe" },
+  { year: "2022", title: "Zauberwürfel & Schach", desc: "Einführung der Zauberwürfel- und Schachkurse" },
   { year: "2023", title: "1. Vorstand Schlagball HH", desc: "Wahl zum 1. Vorstand des Schlagball Hamburg e.V." },
   { year: "Heute", title: "4 Disziplinen, 1 Mission", desc: "Aktiver Trainer, Lehrer und Berater in Hamburg" },
 ];
@@ -21,7 +21,8 @@ const qualifications = [
   { icon: "🏛️", title: "1. Vorstand", desc: "Schlagball Hamburg e.V." },
   { icon: "📚", title: "Erfahrener Lehrer", desc: "Unterricht auf allen Levels" },
   { icon: "🤝", title: "Berater", desc: "Vereins- und Organisationsberatung" },
-  { icon: "🏊", title: "Schwimmlehrer", desc: "4 Jahre Unterrichtserfahrung" },
+  { icon: "🧩", title: "Zauberwürfel-Coach", desc: "Anfänger bis Speed-Cubing" },
+  { icon: "♞", title: "Schachtrainer", desc: "Eröffnung, Mittelspiel, Endspiel" },
   { icon: "🏸", title: "Badminton-Trainer", desc: "Leiter eigener Trainingsgruppe" },
 ];
 
@@ -37,8 +38,8 @@ export default function UeberMichPage() {
           </h1>
           <p className="text-muted text-lg leading-relaxed">
             Seit knapp einem Jahrzehnt begleite ich Menschen auf ihrem Weg – egal ob es darum geht,
-            den Zauberwürfel zu lösen, die ersten Züge im Schach zu meistern, sicher im Wasser zu
-            werden oder auf dem Badminton-Court zu glänzen.
+            den Zauberwürfel zu lösen, die ersten Züge im Schach zu meistern, auf dem Badminton-Court
+            zu glänzen oder im Schlagball-Verein Teil eines Teams zu werden.
           </p>
         </RevealOnScroll>
 
@@ -66,14 +67,14 @@ export default function UeberMichPage() {
                 ich nicht nur sportliches Know-how mit, sondern auch echtes Organisationstalent.
               </p>
               <p>
-                Mein Ziel ist es, jeden meiner Teilnehmer individuell zu fördern – sei es im
-                DenkSport, im Schwimmunterricht, auf dem Badminton-Court oder auf dem Schlagball-Feld.
-                Dabei stehen Freude, Sicherheit und echte Entwicklung immer im Mittelpunkt.
+                Mein Ziel ist es, jeden meiner Teilnehmer individuell zu fördern – ob am Zauberwürfel,
+                am Schachbrett, auf dem Badminton-Court oder auf dem Schlagball-Feld.
+                Dabei stehen Freude, Klarheit und echte Entwicklung immer im Mittelpunkt.
               </p>
               <p>
                 Was mich antreibt? Die Begeisterung in den Augen meiner Schüler, wenn sie einen
-                neuen Meilenstein erreichen. Ob das der erste gelöste Zauberwürfel ist, die erste
-                Bahn im Schwimmbecken oder der erste gewonnene Satz im Badminton.
+                neuen Meilenstein erreichen. Ob das der erste gelöste Zauberwürfel ist, das erste
+                gewonnene Schachspiel oder der entscheidende Punkt im Mannschaftsspiel.
               </p>
             </div>
           </RevealOnScroll>

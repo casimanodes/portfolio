@@ -6,20 +6,19 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Trainer Hamburg – Kurse, Training & Beratung",
   description:
-    "Trainer, Lehrer und Berater in Hamburg – DenkSport, Schwimmen, Badminton und Schlagball. Jetzt Kurs buchen.",
+    "Trainer, Lehrer und Berater in Hamburg – Zauberwürfel, Schach, Schlagball und Badminton. Jetzt Kurs buchen.",
   keywords: [
     "Trainer Hamburg",
-    "DenkSport",
     "Zauberwürfel Kurs",
     "Schachkurs Hamburg",
-    "Schwimmunterricht Hamburg",
+    "Schach Unterricht Hamburg",
     "Badminton Training",
     "Schlagball Hamburg",
   ],
   openGraph: {
     title: "Trainer Hamburg – Kurse, Training & Beratung",
     description:
-      "Lizenzierter Trainer und Berater in Hamburg. DenkSport, Schwimmen, Badminton, Schlagball.",
+      "Lizenzierter Trainer und Berater in Hamburg. Zauberwürfel, Schach, Schlagball und Badminton.",
     type: "website",
     locale: "de_DE",
   },

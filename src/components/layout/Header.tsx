@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const offerLinks = [
-  { href: "/angebote/denksport", label: "DenkSport", icon: "🧩" },
-  { href: "/angebote/schlagball", label: "Schlagball", icon: "🏏" },
-  { href: "/angebote/schwimmen", label: "Schwimmen", icon: "🏊" },
+  { href: "/angebote/zauberwuerfel", label: "Zauberwürfel", icon: "🧩" },
+  { href: "/angebote/schach", label: "Schach", icon: "♞" },
+  { href: "/angebote/schlagball", label: "Schlagball", icon: "🏓" },
   { href: "/angebote/badminton", label: "Badminton", icon: "🏸" },
 ];
 
@@ -22,7 +22,6 @@ const navLinks = [
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [offersOpen, setOffersOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -45,8 +44,8 @@ export default function Header() {
         }`}
       >
         <div className="container-custom">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3">
+          <div className="flex items-center justify-between gap-4">
+            <Link href="/" className="flex items-center gap-3 shrink-0">
               <div className="w-10 h-10 bg-primary rounded-[10px] flex items-center justify-center font-display font-black text-xl text-white">
                 T
               </div>
@@ -60,46 +59,25 @@ export default function Header() {
               </div>
             </Link>
 
-            <ul className="hidden lg:flex items-center gap-1">
-              {/* Angebote Dropdown */}
-              <li className="relative">
-                <button
-                  className="flex items-center gap-1 px-4 py-2 rounded-lg text-[0.9rem] font-medium text-muted hover:text-text hover:bg-surface transition-all duration-300"
-                  onClick={() => setOffersOpen(!offersOpen)}
-                  onBlur={() => setTimeout(() => setOffersOpen(false), 200)}
-                >
-                  Angebote <ChevronDown className={`w-4 h-4 transition-transform ${offersOpen ? "rotate-180" : ""}`} />
-                </button>
-                {offersOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-56 bg-surface border border-border rounded-xl p-2 shadow-[0_4px_24px_rgba(0,0,0,0.4)] z-50">
-                    {offerLinks.map((link) => (
-                      <Link
-                        key={link.href}
-                        href={link.href}
-                        className="flex items-center gap-3 px-4 py-3 rounded-lg text-[0.9rem] text-muted hover:text-text hover:bg-surface2 transition-all"
-                        onClick={() => setOffersOpen(false)}
-                      >
-                        <span className="text-lg">{link.icon}</span>
-                        {link.label}
-                      </Link>
-                    ))}
-                    <div className="border-t border-border mt-1 pt-1">
-                      <Link
-                        href="/angebote"
-                        className="flex items-center gap-3 px-4 py-3 rounded-lg text-[0.9rem] text-primary hover:bg-primary-dim transition-all"
-                        onClick={() => setOffersOpen(false)}
-                      >
-                        Alle Angebote →
-                      </Link>
-                    </div>
-                  </div>
-                )}
-              </li>
+            {/* Angebote direkt sichtbar */}
+            <ul className="hidden lg:flex items-center gap-1 flex-1 justify-center">
+              {offerLinks.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-[0.9rem] font-medium text-text/90 hover:text-text hover:bg-surface transition-all duration-300"
+                  >
+                    <span className="text-base leading-none">{link.icon}</span>
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+              <li className="mx-2 h-6 w-px bg-border" aria-hidden />
               {navLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="px-4 py-2 rounded-lg text-[0.9rem] font-medium text-muted hover:text-text hover:bg-surface transition-all duration-300"
+                    className="px-3 py-2 rounded-lg text-[0.9rem] font-medium text-muted hover:text-text hover:bg-surface transition-all duration-300"
                   >
                     {link.label}
                   </Link>
@@ -107,10 +85,7 @@ export default function Header() {
               ))}
             </ul>
 
-            <div className="hidden lg:flex items-center gap-3">
-              <Button variant="outline" size="sm" asChild>
-                <Link href="/kontakt">Kontakt</Link>
-              </Button>
+            <div className="hidden lg:flex items-center gap-3 shrink-0">
               <Button size="sm" asChild>
                 <Link href="/kontakt?buchen=true">Kurs buchen</Link>
               </Button>
