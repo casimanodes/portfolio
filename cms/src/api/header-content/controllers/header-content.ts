@@ -1,2 +1,4 @@
 import { factories } from '@strapi/strapi';
-export default factories.createCoreController('api::header-content.header-content');
+export default factories.createCoreController(
+  'api::header-content.header-content' as any,
+);

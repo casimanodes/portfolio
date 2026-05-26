@@ -491,6 +491,83 @@ export interface ApiFaqFaq extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiContactSectionContactSection
+  extends Struct.SingleTypeSchema {
+  collectionName: 'contact_sections';
+  info: {
+    description: 'Kontakt-Bereich Inhalte (Heading, Labels, Interest-Optionen)';
+    displayName: 'Contact Section';
+    pluralName: 'contact-sections';
+    singularName: 'contact-section';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    consentText: Schema.Attribute.Text;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    emailLabel: Schema.Attribute.String;
+    formHeading: Schema.Attribute.String;
+    formIntro: Schema.Attribute.String;
+    heading: Schema.Attribute.String;
+    interests: Schema.Attribute.Text;
+    intro: Schema.Attribute.Text;
+    label: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::contact-section.contact-section'
+    > &
+      Schema.Attribute.Private;
+    locationLabel: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    responseLabel: Schema.Attribute.String;
+    socialLabel: Schema.Attribute.String;
+    submitLabel: Schema.Attribute.String;
+    successMessage: Schema.Attribute.Text;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiHeaderContentHeaderContent
+  extends Struct.SingleTypeSchema {
+  collectionName: 'header_contents';
+  info: {
+    description: 'Header-Bereich Inhalte (Brand, Nav-Label, CTA)';
+    displayName: 'Header';
+    pluralName: 'header-contents';
+    singularName: 'header-content';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    brandName: Schema.Attribute.String;
+    brandSubtitle: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    ctaLabel: Schema.Attribute.String;
+    ctaLink: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::header-content.header-content'
+    > &
+      Schema.Attribute.Private;
+    logoText: Schema.Attribute.String;
+    moreLabel: Schema.Attribute.String;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiHeroContentHeroContent extends Struct.SingleTypeSchema {
   collectionName: 'hero_contents';
   info: {
@@ -521,6 +598,38 @@ export interface ApiHeroContentHeroContent extends Struct.SingleTypeSchema {
     tagline: Schema.Attribute.String;
     titleLine1: Schema.Attribute.String;
     titleLine2: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiOffersSectionOffersSection
+  extends Struct.SingleTypeSchema {
+  collectionName: 'offers_sections';
+  info: {
+    description: "Bereich 'Was ich dir bieten kann' auf der Startseite";
+    displayName: 'Offers Section';
+    pluralName: 'offers-sections';
+    singularName: 'offers-section';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    heading: Schema.Attribute.String;
+    intro: Schema.Attribute.Text;
+    label: Schema.Attribute.String;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::offers-section.offers-section'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1294,9 +1403,12 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::about-content.about-content': ApiAboutContentAboutContent;
+      'api::contact-section.contact-section': ApiContactSectionContactSection;
       'api::faq.faq': ApiFaqFaq;
+      'api::header-content.header-content': ApiHeaderContentHeaderContent;
       'api::hero-content.hero-content': ApiHeroContentHeroContent;
       'api::offer.offer': ApiOfferOffer;
+      'api::offers-section.offers-section': ApiOffersSectionOffersSection;
       'api::price.price': ApiPricePrice;
       'api::schedule.schedule': ApiScheduleSchedule;
       'api::site-setting.site-setting': ApiSiteSettingSiteSetting;
