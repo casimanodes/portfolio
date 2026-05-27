@@ -20,6 +20,34 @@ interface DynamicFrameLayoutProps {
 const HOVER_SIZE = 7.5;
 const GAP = 4;
 
+// Fallback-Bild wenn Strapi/Daten keine bild liefern oder die URL ungültig ist.
+const FALLBACK_IMAGE = "/images/denksport.svg";
+
+// Slug → bekanntes lokales Asset (falls Strapi bild leer ist und der Slug zu
+// einem unserer SVGs in /public/images/ passt).
+const SLUG_TO_LOCAL_IMAGE: Record<string, string> = {
+  zauberwuerfel: "/images/zauberwuerfel.svg",
+  schach: "/images/schach.svg",
+  schlagball: "/images/schlagball.svg",
+  badminton: "/images/badminton.svg",
+  // Legacy slugs für alte Strapi-Daten:
+  denksport: "/images/denksport.svg",
+  schwimmen: "/images/schwimmen.svg",
+};
+
+function resolveBild(item: ThemenbereichItem): string {
+  if (item.bild && item.bild.trim().length > 0) return item.bild;
+  if (item.slug && SLUG_TO_LOCAL_IMAGE[item.slug]) {
+    return SLUG_TO_LOCAL_IMAGE[item.slug];
+  }
+  return FALLBACK_IMAGE;
+}
+
+function isSvgSource(src: string): boolean {
+  // Sowohl direkter Pfad als auch URL mit Query (z. B. Strapi /uploads/foo.svg?...).
+  return /\.svg(\?.*)?$/i.test(src);
+}
+
 export default function DynamicFrameLayout({ items }: DynamicFrameLayoutProps) {
   const [hovered, setHovered] = useState<{ row: number; col: number } | null>(
     null
@@ -34,7 +62,6 @@ export default function DynamicFrameLayout({ items }: DynamicFrameLayoutProps) {
       .join(" ");
   };
 
-  // Ensure exactly 4 items in a 2x2 grid
   const grid = items.slice(0, 4);
 
   return (
@@ -56,6 +83,9 @@ export default function DynamicFrameLayout({ items }: DynamicFrameLayoutProps) {
         const isHovered =
           hovered !== null && hovered.row === row && hovered.col === col;
 
+        const src = resolveBild(item);
+        const isSvg = isSvgSource(src);
+
         return (
           <Link
             key={item.id}
@@ -64,26 +94,26 @@ export default function DynamicFrameLayout({ items }: DynamicFrameLayoutProps) {
             onMouseEnter={() => setHovered({ row, col })}
             onMouseLeave={() => setHovered(null)}
           >
-            {/* Background image */}
             <Image
-              src={item.bild}
+              src={src}
               alt={item.titel}
               fill
+              // SVGs werden vom Image-Optimizer aktiv abgelehnt (Vercel:
+              // INVALID_IMAGE_OPTIMIZE_REQUEST). SVGs sind Vektorgrafiken und
+              // brauchen keine Optimierung — direkt ausliefern.
+              unoptimized={isSvg}
               className="object-cover transition-transform duration-500 group-hover:scale-105"
               sizes="(max-width: 1024px) 50vw, 25vw"
             />
 
-            {/* Permanent gradient overlay for title readability */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent z-10" />
 
-            {/* Title — always visible at bottom */}
             <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
               <h3 className="font-display font-bold text-white text-lg leading-tight drop-shadow-lg">
                 {item.titel}
               </h3>
             </div>
 
-            {/* Hover overlay with description */}
             <div
               className={`absolute inset-0 z-30 flex flex-col justify-end p-5 transition-opacity duration-300 ${
                 isHovered ? "opacity-100" : "opacity-0"

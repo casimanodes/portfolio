@@ -252,8 +252,8 @@ export const mockFAQ: FAQItem[] = [
 
 // ── Themenbereiche (Hero-Grid) ──
 export const mockThemenbereiche: ThemenbereichItem[] = [
-  { id: 1, titel: "Zauberw\u00fcrfel", beschreibung: "Vom ersten W\u00fcrfel bis zum Speed-Cubing \u2013 Schritt f\u00fcr Schritt, mit Geduld und System. F\u00fcr alle Altersgruppen, Einzel- und Gruppenunterricht.", bild: "/images/denksport.svg", slug: "zauberwuerfel", reihenfolge: 1 },
-  { id: 2, titel: "Schach", beschreibung: "Strukturierter Schachunterricht: Grundlagen, Taktik, Er\u00f6ffnung und Endspiel. F\u00fcr Anf\u00e4nger, Hobbyspieler und ambitionierte Vereinsspieler.", bild: "/images/denksport.svg", slug: "schach", reihenfolge: 2 },
+  { id: 1, titel: "Zauberw\u00fcrfel", beschreibung: "Vom ersten W\u00fcrfel bis zum Speed-Cubing \u2013 Schritt f\u00fcr Schritt, mit Geduld und System. F\u00fcr alle Altersgruppen, Einzel- und Gruppenunterricht.", bild: "/images/zauberwuerfel.svg", slug: "zauberwuerfel", reihenfolge: 1 },
+  { id: 2, titel: "Schach", beschreibung: "Strukturierter Schachunterricht: Grundlagen, Taktik, Er\u00f6ffnung und Endspiel. F\u00fcr Anf\u00e4nger, Hobbyspieler und ambitionierte Vereinsspieler.", bild: "/images/schach.svg", slug: "schach", reihenfolge: 2 },
   { id: 3, titel: "Schlagball", beschreibung: "Vereinstraining, Turniere und Gemeinschaft. Als 1. Vorstand des Schlagball Hamburg e.V. leite ich ein engagiertes Team.", bild: "/images/schlagball.svg", slug: "schlagball", reihenfolge: 3 },
   { id: 4, titel: "Badminton", beschreibung: "Strukturiertes Training mit Fokus auf Technik, Spielverst\u00e4ndnis und Freude am Spiel. Eigene Trainingsgruppe f\u00fcr alle Niveaus.", bild: "/images/badminton.svg", slug: "badminton", reihenfolge: 4 },
 ];

@@ -325,6 +325,25 @@ export async function getFAQ(): Promise<FAQItem[]> {
   }
 }
 
+// Slug → lokales Fallback-Bild (wenn Strapi kein bild-Asset hochgeladen hat)
+const SLUG_FALLBACK_IMAGE: Record<string, string> = {
+  zauberwuerfel: "/images/zauberwuerfel.svg",
+  schach: "/images/schach.svg",
+  schlagball: "/images/schlagball.svg",
+  badminton: "/images/badminton.svg",
+  denksport: "/images/denksport.svg",
+  schwimmen: "/images/schwimmen.svg",
+};
+
+function resolveThemenbereichBild(strapiUrl: string | undefined, slug: string): string {
+  // 1) Strapi-Bild wenn vorhanden
+  if (strapiUrl && strapiUrl.trim().length > 0) return strapiUrl;
+  // 2) Lokales Fallback für bekannten Slug
+  if (slug && SLUG_FALLBACK_IMAGE[slug]) return SLUG_FALLBACK_IMAGE[slug];
+  // 3) Generisches Fallback
+  return "/images/denksport.svg";
+}
+
 // ── Themenbereiche (Hero-Grid) ──
 export async function getThemenbereiche(): Promise<ThemenbereichItem[]> {
   if (USE_MOCK) return mockThemenbereiche;
@@ -333,14 +352,17 @@ export async function getThemenbereiche(): Promise<ThemenbereichItem[]> {
       "/themenbereiche?populate=*&sort=reihenfolge:asc"
     );
 
-    return raw.map((item) => ({
-      id: item.id,
-      titel: item.titel,
-      beschreibung: item.beschreibung,
-      bild: strapiImage(item.bild?.url) || "",
-      slug: item.slug || item.titel.toLowerCase().replace(/\s+/g, "-"),
-      reihenfolge: item.reihenfolge,
-    }));
+    return raw.map((item) => {
+      const slug = item.slug || item.titel.toLowerCase().replace(/\s+/g, "-");
+      return {
+        id: item.id,
+        titel: item.titel,
+        beschreibung: item.beschreibung,
+        bild: resolveThemenbereichBild(strapiImage(item.bild?.url), slug),
+        slug,
+        reihenfolge: item.reihenfolge,
+      };
+    });
   } catch {
     return mockThemenbereiche;
   }

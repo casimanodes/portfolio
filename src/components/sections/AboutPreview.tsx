@@ -29,6 +29,7 @@ export default function AboutPreview({ about }: AboutPreviewProps) {
                   src={about.portraitImage}
                   alt="Portrait"
                   fill
+                  unoptimized={/\.svg(\?.*)?$/i.test(about.portraitImage)}
                   className="object-cover"
                 />
               ) : (
