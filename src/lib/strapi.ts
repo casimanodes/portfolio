@@ -40,6 +40,35 @@ export function strapiImage(url?: string | null): string | undefined {
   return `${STRAPI_URL}${url}`;
 }
 
+// Strapi v5 kann Media-Felder in mehreren Formen zurückgeben:
+// - Strapi 5 default (mit populate=*): { id, url, mime, formats: { ... } }
+// - Strapi 4 legacy:                  { data: { id, attributes: { url, ... } } }
+// - Strapi 4 plain:                   { url, mime, ... }
+// Wir versuchen alle drei und fallen am Ende auf `undefined` zurück.
+export function strapiMediaUrl(media: any): string | undefined {
+  if (!media) return undefined;
+
+  // Falls schon ein String (selten, aber möglich):
+  if (typeof media === "string") return strapiImage(media);
+
+  // Strapi v5 flach:
+  if (typeof media.url === "string") return strapiImage(media.url);
+
+  // Strapi v4 nested:
+  const v4Url = media?.data?.attributes?.url ?? media?.data?.url;
+  if (typeof v4Url === "string") return strapiImage(v4Url);
+
+  // Manche Felder enthalten formats statt url:
+  const fmt = media.formats || media?.data?.attributes?.formats;
+  if (fmt) {
+    const candidate =
+      fmt.large?.url || fmt.medium?.url || fmt.small?.url || fmt.thumbnail?.url;
+    if (typeof candidate === "string") return strapiImage(candidate);
+  }
+
+  return undefined;
+}
+
 // ── Generischer Strapi v5 Fetch ──
 async function fetchStrapi<T>(endpoint: string): Promise<T> {
   const headers: Record<string, string> = {
@@ -203,7 +232,7 @@ export async function getAboutContent(): Promise<AboutContent> {
       highlightedWord: raw.highlightedWord || mockAbout.highlightedWord,
       text1: raw.text1 || mockAbout.text1,
       text2: raw.text2 || mockAbout.text2,
-      portraitImage: strapiImage(raw.portraitImage?.url),
+      portraitImage: strapiMediaUrl(raw.portraitImage),
       portraitBadgeText: raw.portraitBadgeText || mockAbout.portraitBadgeText,
       qualifications: raw.qualifications || mockAbout.qualifications,
       tags: raw.tags || mockAbout.tags,
@@ -244,7 +273,7 @@ export async function getOffers(): Promise<Offer[]> {
         description: p.description,
         highlighted: p.highlighted || false,
       })),
-      image: strapiImage(item.image?.url),
+      image: strapiMediaUrl(item.image),
       ctaText: item.ctaText,
       ctaLink: item.ctaLink,
       externalLink: item.externalLink || undefined,
@@ -358,7 +387,7 @@ export async function getThemenbereiche(): Promise<ThemenbereichItem[]> {
         id: item.id,
         titel: item.titel,
         beschreibung: item.beschreibung,
-        bild: resolveThemenbereichBild(strapiImage(item.bild?.url), slug),
+        bild: resolveThemenbereichBild(strapiMediaUrl(item.bild), slug),
         slug,
         reihenfolge: item.reihenfolge,
       };

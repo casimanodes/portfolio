@@ -20,22 +20,19 @@ interface DynamicFrameLayoutProps {
 const HOVER_SIZE = 7.5;
 const GAP = 4;
 
-// Fallback-Bild wenn Strapi/Daten keine bild liefern oder die URL ungültig ist.
 const FALLBACK_IMAGE = "/images/denksport.svg";
 
-// Slug → bekanntes lokales Asset (falls Strapi bild leer ist und der Slug zu
-// einem unserer SVGs in /public/images/ passt).
+// Slug → bekanntes lokales SVG-Fallback (wenn Strapi-Bild fehlt oder fehlschlägt)
 const SLUG_TO_LOCAL_IMAGE: Record<string, string> = {
   zauberwuerfel: "/images/zauberwuerfel.svg",
   schach: "/images/schach.svg",
   schlagball: "/images/schlagball.svg",
   badminton: "/images/badminton.svg",
-  // Legacy slugs für alte Strapi-Daten:
   denksport: "/images/denksport.svg",
   schwimmen: "/images/schwimmen.svg",
 };
 
-function resolveBild(item: ThemenbereichItem): string {
+function resolveInitialBild(item: ThemenbereichItem): string {
   if (item.bild && item.bild.trim().length > 0) return item.bild;
   if (item.slug && SLUG_TO_LOCAL_IMAGE[item.slug]) {
     return SLUG_TO_LOCAL_IMAGE[item.slug];
@@ -44,8 +41,75 @@ function resolveBild(item: ThemenbereichItem): string {
 }
 
 function isSvgSource(src: string): boolean {
-  // Sowohl direkter Pfad als auch URL mit Query (z. B. Strapi /uploads/foo.svg?...).
   return /\.svg(\?.*)?$/i.test(src);
+}
+
+// Eine einzelne Karte: gekapselt, damit jede Karte ihren eigenen
+// onError-Fallback-State hat.
+function FrameCard({
+  item,
+  isHovered,
+  onEnter,
+  onLeave,
+}: {
+  item: ThemenbereichItem;
+  isHovered: boolean;
+  onEnter: () => void;
+  onLeave: () => void;
+}) {
+  const [src, setSrc] = useState<string>(() => resolveInitialBild(item));
+  const isSvg = isSvgSource(src);
+
+  return (
+    <Link
+      href={`/angebote/${item.slug}`}
+      className="relative rounded-xl overflow-hidden cursor-pointer group"
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeave}
+    >
+      <Image
+        src={src}
+        alt={item.titel}
+        fill
+        // SVG: am Image-Optimizer vorbei.
+        // JPG/PNG/WEBP: optimieren — wenn die Quelle (z. B. ein Strapi-Upload)
+        // fehlschlägt, springt onError auf das lokale SVG-Fallback.
+        unoptimized={isSvg}
+        onError={() => {
+          const fallback =
+            SLUG_TO_LOCAL_IMAGE[item.slug] || FALLBACK_IMAGE;
+          if (src !== fallback) setSrc(fallback);
+        }}
+        className="object-cover transition-transform duration-500 group-hover:scale-105"
+        sizes="(max-width: 1024px) 50vw, 25vw"
+      />
+
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent z-10" />
+
+      <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
+        <h3 className="font-display font-bold text-white text-lg leading-tight drop-shadow-lg">
+          {item.titel}
+        </h3>
+      </div>
+
+      <div
+        className={`absolute inset-0 z-30 flex flex-col justify-end p-5 transition-opacity duration-300 ${
+          isHovered ? "opacity-100" : "opacity-0"
+        }`}
+        style={{ background: "rgba(10, 10, 18, 0.75)" }}
+      >
+        <h3 className="font-display font-bold text-white text-xl mb-2">
+          {item.titel}
+        </h3>
+        <p className="text-white/80 text-sm leading-relaxed line-clamp-4">
+          {item.beschreibung}
+        </p>
+        <span className="inline-flex items-center gap-1 text-primary text-sm font-semibold mt-3">
+          Mehr erfahren →
+        </span>
+      </div>
+    </Link>
+  );
 }
 
 export default function DynamicFrameLayout({ items }: DynamicFrameLayoutProps) {
@@ -83,54 +147,14 @@ export default function DynamicFrameLayout({ items }: DynamicFrameLayoutProps) {
         const isHovered =
           hovered !== null && hovered.row === row && hovered.col === col;
 
-        const src = resolveBild(item);
-        const isSvg = isSvgSource(src);
-
         return (
-          <Link
+          <FrameCard
             key={item.id}
-            href={`/angebote/${item.slug}`}
-            className="relative rounded-xl overflow-hidden cursor-pointer group"
-            onMouseEnter={() => setHovered({ row, col })}
-            onMouseLeave={() => setHovered(null)}
-          >
-            <Image
-              src={src}
-              alt={item.titel}
-              fill
-              // SVGs werden vom Image-Optimizer aktiv abgelehnt (Vercel:
-              // INVALID_IMAGE_OPTIMIZE_REQUEST). SVGs sind Vektorgrafiken und
-              // brauchen keine Optimierung — direkt ausliefern.
-              unoptimized={isSvg}
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
-              sizes="(max-width: 1024px) 50vw, 25vw"
-            />
-
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent z-10" />
-
-            <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
-              <h3 className="font-display font-bold text-white text-lg leading-tight drop-shadow-lg">
-                {item.titel}
-              </h3>
-            </div>
-
-            <div
-              className={`absolute inset-0 z-30 flex flex-col justify-end p-5 transition-opacity duration-300 ${
-                isHovered ? "opacity-100" : "opacity-0"
-              }`}
-              style={{ background: "rgba(10, 10, 18, 0.75)" }}
-            >
-              <h3 className="font-display font-bold text-white text-xl mb-2">
-                {item.titel}
-              </h3>
-              <p className="text-white/80 text-sm leading-relaxed line-clamp-4">
-                {item.beschreibung}
-              </p>
-              <span className="inline-flex items-center gap-1 text-primary text-sm font-semibold mt-3">
-                Mehr erfahren →
-              </span>
-            </div>
-          </Link>
+            item={item}
+            isHovered={isHovered}
+            onEnter={() => setHovered({ row, col })}
+            onLeave={() => setHovered(null)}
+          />
         );
       })}
     </div>
